@@ -1,0 +1,25 @@
+# Local outputs and archives
+/output/
+/docs/
+*.zip
+
+# Vendored or reference repositories
+/skills-main/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local environment and state
+.env
+.env.*
+.venv/
+venv/
+profile.json
+*.tmp
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
