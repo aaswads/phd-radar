@@ -1,5 +1,7 @@
 # PhD Radar
 
+**English** | [简体中文](README.zh-CN.md)
+
 PhD Radar is a Codex skill for finding, verifying, screening, scoring, and presenting funded or salaried doctoral opportunities. It combines targeted vacancy sources with open-web discovery, then returns to official university, institute, employer, project, or application pages before admitting a result to the ranked set.
 
 ## What it does
@@ -8,7 +10,7 @@ PhD Radar is a Codex skill for finding, verifying, screening, scoring, and prese
 - Discovers advertised PhD positions and funded-program routes.
 - Verifies opportunities against official sources.
 - Screens institutions and research groups using configurable criteria.
-- Scores and ranks verified results on a 0–10 scale.
+- Scores and ranks verified results on a 0-10 scale.
 - Generates a self-contained card-based HTML dashboard.
 
 ## Install
@@ -30,12 +32,12 @@ On first use, the skill guides you through creating a reusable search profile.
 
 ```text
 skill-src/phd-radar/
-├── SKILL.md
-├── agents/openai.yaml
-├── assets/
-├── examples/
-├── references/
-└── scripts/
+|-- SKILL.md
+|-- agents/openai.yaml
+|-- assets/
+|-- examples/
+|-- references/
+`-- scripts/
 ```
 
 The bundled Python scripts use the standard library and support profile storage, deterministic ranking, and dashboard rendering.
