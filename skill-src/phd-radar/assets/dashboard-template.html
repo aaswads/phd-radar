@@ -101,6 +101,17 @@
     .results-head h2 { margin: 0; font-size: 17px; }
     .results-count { color: var(--muted); font-size: 13px; }
     .cards { display: grid; gap: 14px; }
+    .provisional-section { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+    .provisional-section[hidden] { display: none; }
+    .provisional-note { margin: -4px 0 14px; color: var(--muted); font-size: 12px; }
+    .low-score-section { margin-top: 30px; border-top: 1px solid var(--line); }
+    .low-score-section[hidden] { display: none; }
+    .low-score-section > summary {
+      display: flex; justify-content: space-between; gap: 18px; align-items: center;
+      padding: 20px 2px 12px; color: var(--text); cursor: pointer; font-size: 16px; font-weight: 760;
+    }
+    .low-score-section > summary::marker { color: var(--accent); }
+    .low-score-note { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
     .card {
       position: relative;
       overflow: hidden;
@@ -111,6 +122,9 @@
       box-shadow: var(--shadow);
     }
     .card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--accent); }
+    .card.provisional { box-shadow: none; }
+    .card.provisional::before { background: var(--warn); }
+    .card.provisional .score { background: #fff0d8; color: var(--warn); }
     .card-top { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 17px; align-items: start; }
     .score {
       display: grid; place-items: center; width: 74px; height: 74px;
@@ -218,12 +232,22 @@
         <div class="field"><label for="qs-screen">QS 筛选</label><select id="qs-screen"><option value="">全部状态</option><option value="preferred">学科优选</option><option value="pass">门槛通过</option><option value="manual_review">人工复核</option></select></div>
         <div class="field"><label for="lab-screen">课题组核验</label><select id="lab-screen"><option value="">全部状态</option><option value="strong">证据强</option><option value="adequate">证据充分</option><option value="weak">证据弱</option><option value="incomplete">待补充</option></select></div>
         <button class="reset" id="reset" type="button">重置筛选</button>
-        <p class="filter-note">仅展示经过官方页面核验的正式机会。排序使用未舍入综合分，显示值保留一位小数。</p>
+        <p class="filter-note">展示全部值得查看且已回到官方页面核验的机会；低于 <span class="collapse-threshold">8.0</span> 分的项目默认折叠。排序使用未舍入综合分，显示值保留一位小数。</p>
       </aside>
 
       <section class="results" aria-live="polite">
         <div class="results-head"><h2>推荐项目</h2><span class="results-count" id="results-count"></span></div>
         <div class="cards" id="cards"></div>
+        <section class="provisional-section" id="provisional-section" hidden>
+          <div class="results-head"><h2>值得继续核验</h2><span class="results-count" id="provisional-count"></span></div>
+          <p class="provisional-note">这些项目具有官方项目、申请或导师线索，但仍缺少明确列出的关键确认，不进入正式排名。</p>
+          <div class="cards" id="provisional-cards"></div>
+        </section>
+        <details class="low-score-section" id="low-score-section" hidden>
+          <summary><span>其他值得查看的项目（低于 <span class="collapse-threshold">8.0</span> 分）</span><span class="results-count" id="low-score-count"></span></summary>
+          <p class="low-score-note">这些项目仍保留在结果中并维持分数顺序；展开后可查看完整卡片、官方入口和待确认事项。</p>
+          <div class="cards" id="low-score-cards"></div>
+        </details>
       </section>
     </div>
     <footer class="footer" id="footer"></footer>
@@ -233,10 +257,23 @@
   <script>
     const data = JSON.parse(document.getElementById('dashboard-data').textContent);
     const results = Array.isArray(data.results) ? data.results : [];
+    const provisionalResults = Array.isArray(data.needs_confirmation) ? data.needs_confirmation : [];
     const summary = data.summary || {};
     const meta = data.meta || {};
+    const DEFAULT_COLLAPSE_BELOW_SCORE = 8;
+    const configuredCollapseScore = Number(meta.collapse_below_score ?? data.dashboard?.collapse_below_score ?? data.profile_snapshot?.dashboard?.collapse_below_score);
+    const COLLAPSE_BELOW_SCORE = Number.isFinite(configuredCollapseScore) && configuredCollapseScore >= 0 && configuredCollapseScore <= 10 ? configuredCollapseScore : DEFAULT_COLLAPSE_BELOW_SCORE;
+    const isFixture = meta.fixture_only === true;
     const esc = (v = '') => String(v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    const safeUrl = (v) => /^https?:\/\//i.test(v || '') ? v : '';
+    const safeUrl = (v) => {
+      if (isFixture) return '';
+      try {
+        const parsed = new URL(v);
+        const host = parsed.hostname.toLowerCase().replace(/\.$/, '');
+        const reserved = ['example.com', 'example.org', 'example.net'].some(name => host === name || host.endsWith(`.${name}`));
+        return ['http:', 'https:'].includes(parsed.protocol) && !reserved ? parsed.href : '';
+      } catch { return ''; }
+    };
     const score = (item, key) => Number(item[key] ?? item[key + '_raw'] ?? 0).toFixed(1);
     const fieldStatus = (item, name) => (item.field_evidence || []).find(x => x.field === name)?.status || 'unknown';
 
@@ -245,17 +282,18 @@
     document.getElementById('run-date').textContent = meta.generated_at ? `生成于 ${meta.generated_at}` : '最新结果';
     document.getElementById('coverage-label').textContent = meta.coverage_label || '结构化来源 + 地区 Web 发现';
     document.getElementById('footer').textContent = meta.footer || 'PhD Radar 仅汇总公开信息；申请前请再次核对官方页面。';
+    document.querySelectorAll('.collapse-threshold').forEach(node => { node.textContent = COLLAPSE_BELOW_SCORE.toFixed(1); });
 
     const stats = [
       ['正式机会', summary.verified_opportunities ?? results.length, true],
       ['8.0 分以上', summary.score_8_plus ?? results.filter(x => Number(x.overall_match_raw ?? x.overall_match) >= 8).length],
       ['成功回源', summary.official_returns ?? results.length],
-      ['待核验线索', summary.pending_leads ?? 0],
+      ['值得核验', summary.needs_confirmation ?? provisionalResults.length],
       ['覆盖地区', summary.regions ?? new Set(results.map(x => x.country).filter(Boolean)).size]
     ];
     document.getElementById('stats').innerHTML = stats.map(([label, value, accent]) => `<article class="stat ${accent ? 'accent' : ''}"><span class="value">${esc(value)}</span><span class="label">${esc(label)}</span></article>`).join('');
 
-    const countries = [...new Set(results.map(x => x.country).filter(Boolean))].sort();
+    const countries = [...new Set([...results, ...provisionalResults].map(x => x.country).filter(Boolean))].sort();
     document.getElementById('country').insertAdjacentHTML('beforeend', countries.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join(''));
 
     function action(url, label, primary = false) {
@@ -263,16 +301,19 @@
       return valid ? `<a class="action ${primary ? 'primary' : 'secondary'}" href="${esc(valid)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>` : `<span class="action secondary" aria-disabled="true">${esc(label)}暂无</span>`;
     }
 
-    function card(item) {
+    function card(item, provisional = false) {
       const deadlineStatus = fieldStatus(item, 'deadline');
       const fundingStatus = fieldStatus(item, 'funding');
       const chips = [item.country, item.city, item.opportunity_type, item.deadline ? `截止 ${item.deadline}` : '截止日期未知']
         .filter(Boolean).map(v => `<span class="chip">${esc(v)}</span>`).join('');
-      const verified = `<span class="chip verified">官方页面已核验</span>`;
+      const verified = provisional ? `<span class="chip warning">关键条件待确认</span>` : `<span class="chip verified">官方页面已核验</span>`;
       const warnings = [deadlineStatus !== 'confirmed' ? '截止日期待核验' : '', fundingStatus !== 'confirmed' ? 'Funding 待核验' : '']
         .filter(Boolean).map(v => `<span class="chip warning">${esc(v)}</span>`).join('');
       const evidenceId = `evidence-${esc(item.opportunity_id)}`;
-      const evidence = (item.field_evidence || []).map(e => `<dt>${esc(e.field)}</dt><dd><strong>${esc(e.status)}</strong> · ${esc(e.value ?? '未确定')} ${safeUrl(e.source_url) ? `· <a href="${esc(e.source_url)}" target="_blank" rel="noopener noreferrer">来源</a>` : ''}</dd>`).join('') || '<dt>证据</dt><dd>官方详情页已记录，暂无字段级摘要。</dd>';
+      const evidence = (item.field_evidence || []).map(e => {
+        const source = safeUrl(e.source_url);
+        return `<dt>${esc(e.field)}</dt><dd><strong>${esc(e.status)}</strong> · ${esc(e.value ?? '未确定')} ${source ? `· <a href="${esc(source)}" target="_blank" rel="noopener noreferrer">来源</a>` : ''}</dd>`;
+      }).join('') || '<dt>证据</dt><dd>官方详情页已记录，暂无字段级摘要。</dd>';
       const institutionScreen = item.institution_screen || {};
       const qsOutcome = institutionScreen.outcome || 'manual_review';
       const qsLabels = {preferred:'学科优选', pass:'门槛通过', manual_review:'人工复核', excluded:'已排除'};
@@ -282,12 +323,13 @@
       const labStatus = lab.status || 'incomplete';
       const labLabels = {strong:'证据强', adequate:'证据充分', weak:'证据弱', incomplete:'待补充'};
       const labFacts = [['近年论文',lab.recent_research],['ERC / MSCA',lab.eu_funding],['博士产出',lab.doctoral_outputs],['外部合作',lab.external_collaboration]].map(([label,value]) => `<span class="screen-fact">${label} <strong>${esc(value || 'unknown')}</strong></span>`).join('');
-      return `<article class="card" data-country="${esc(item.country)}" data-score="${esc(item.overall_match_raw ?? item.overall_match)}" data-search="${esc([item.title,item.institution,item.department,item.pi_or_contact,item.country,item.city].join(' ').toLowerCase())}">
+      const unresolved = (item.unresolved_critical_fields || []).map(v => `<span class="chip warning">待确认：${esc(v)}</span>`).join('');
+      return `<article class="card ${provisional ? 'provisional' : ''}" data-country="${esc(item.country)}" data-score="${esc(item.overall_match_raw ?? item.overall_match)}" data-search="${esc([item.title,item.institution,item.department,item.pi_or_contact,item.country,item.city].join(' ').toLowerCase())}">
         <div class="card-top">
-          <div class="score"><div><strong>${score(item, 'overall_match')}</strong><span>综合推荐 / 10</span></div></div>
-          <div><p class="rankline">推荐 #${esc(item.rank || '')}</p><h3>${esc(item.title || '未命名项目')}</h3><p class="institution">${esc(item.institution || '机构待核验')}${item.department ? ` · ${esc(item.department)}` : ''}</p></div>
+          <div class="score"><div><strong>${score(item, 'overall_match')}</strong><span>${provisional ? '暂定匹配 / 10' : '综合推荐 / 10'}</span></div></div>
+          <div><p class="rankline">${provisional ? '继续核验' : `推荐 #${esc(item.rank || '')}`}</p><h3>${esc(item.title || '未命名项目')}</h3><p class="institution">${esc(item.institution || '机构待核验')}${item.department ? ` · ${esc(item.department)}` : ''}</p></div>
         </div>
-        <div class="chips">${verified}${chips}${warnings}</div>
+        <div class="chips">${verified}${chips}${warnings}${unresolved}</div>
         <div class="card-grid">
           <div><p class="recommendation">${esc(item.recommendation_reason || item.reason || '暂无推荐说明。')}</p></div>
           <aside class="pi-panel"><p class="pi-label">推荐 PI</p><p class="pi-name">${esc(item.pi_or_contact || '待确认')}</p><p class="pi-summary">${esc(item.pi_summary || '查看导师主页了解研究方向与近期项目。')}</p></aside>
@@ -302,6 +344,10 @@
     }
 
     const cards = document.getElementById('cards');
+    const provisionalCards = document.getElementById('provisional-cards');
+    const provisionalSection = document.getElementById('provisional-section');
+    const lowScoreCards = document.getElementById('low-score-cards');
+    const lowScoreSection = document.getElementById('low-score-section');
     const filters = ['query', 'country', 'min-score', 'qs-screen', 'lab-screen'];
     function render() {
       const q = document.getElementById('query').value.trim().toLowerCase();
@@ -310,9 +356,22 @@
       const qsScreen = document.getElementById('qs-screen').value;
       const labScreen = document.getElementById('lab-screen').value;
       const visible = results.filter(item => (!q || [item.title,item.institution,item.department,item.pi_or_contact,item.country,item.city].join(' ').toLowerCase().includes(q)) && (!country || item.country === country) && Number(item.overall_match_raw ?? item.overall_match ?? 0) >= min && (!qsScreen || item.institution_screen?.outcome === qsScreen) && (!labScreen || item.lab_screen?.status === labScreen));
-      cards.innerHTML = visible.length ? visible.map(card).join('') : '<div class="empty"><h3>没有符合当前筛选的项目</h3><p>调整地区、最低分、QS 或课题组筛选后再查看。</p></div>';
-      document.getElementById('results-count').textContent = `显示 ${visible.length} / ${results.length}`;
-      cards.querySelectorAll('.evidence-toggle').forEach(btn => btn.addEventListener('click', () => {
+      const visibleProvisional = provisionalResults.filter(item => (!q || [item.title,item.institution,item.department,item.pi_or_contact,item.country,item.city].join(' ').toLowerCase().includes(q)) && (!country || item.country === country) && Number(item.overall_match_raw ?? item.overall_match ?? 0) >= min && (!qsScreen || item.institution_screen?.outcome === qsScreen) && (!labScreen || item.lab_screen?.status === labScreen));
+      const highFormal = visible.filter(item => Number(item.overall_match_raw ?? item.overall_match ?? 0) >= COLLAPSE_BELOW_SCORE);
+      const lowFormal = visible.filter(item => Number(item.overall_match_raw ?? item.overall_match ?? 0) < COLLAPSE_BELOW_SCORE);
+      const highProvisional = visibleProvisional.filter(item => Number(item.overall_match_raw ?? item.overall_match ?? 0) >= COLLAPSE_BELOW_SCORE);
+      const lowProvisional = visibleProvisional.filter(item => Number(item.overall_match_raw ?? item.overall_match ?? 0) < COLLAPSE_BELOW_SCORE);
+      const lowItems = [...lowFormal.map(item => [item, false]), ...lowProvisional.map(item => [item, true])]
+        .sort((a, b) => Number(b[0].overall_match_raw ?? b[0].overall_match ?? 0) - Number(a[0].overall_match_raw ?? a[0].overall_match ?? 0));
+      cards.innerHTML = highFormal.length ? highFormal.map(item => card(item, false)).join('') : `<div class="empty"><h3>当前没有 ${COLLAPSE_BELOW_SCORE.toFixed(1)} 分以上的正式项目</h3><p>可展开下方“其他值得查看的项目”，或调整筛选条件。</p></div>`;
+      document.getElementById('results-count').textContent = `显示 ${highFormal.length} 个高优先级 · 正式项目共 ${visible.length}`;
+      provisionalSection.hidden = highProvisional.length === 0;
+      provisionalCards.innerHTML = highProvisional.map(item => card(item, true)).join('');
+      document.getElementById('provisional-count').textContent = `${highProvisional.length} 个`;
+      lowScoreSection.hidden = lowItems.length === 0;
+      lowScoreCards.innerHTML = lowItems.map(([item, provisional]) => card(item, provisional)).join('');
+      document.getElementById('low-score-count').textContent = `${lowItems.length} 个`;
+      document.querySelectorAll('.evidence-toggle').forEach(btn => btn.addEventListener('click', () => {
         const panel = document.getElementById(btn.getAttribute('aria-controls'));
         const open = panel.classList.toggle('open');
         btn.setAttribute('aria-expanded', String(open));

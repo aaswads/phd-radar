@@ -20,6 +20,14 @@ def render_dashboard(input_path, output_path, template_path=DEFAULT_TEMPLATE):
         raise ValueError("Input must be a JSON object with a results array or a results array")
 
     payload["results"] = rank_results(payload.get("results", []))
+    payload.setdefault("needs_confirmation", [])
+    payload["needs_confirmation"] = sorted(
+        payload["needs_confirmation"],
+        key=lambda item: (
+            -float(item.get("overall_match_raw", item.get("overall_match", 0)) or 0),
+            str(item.get("opportunity_id", item.get("candidate_id", ""))),
+        ),
+    )
     payload.setdefault("summary", {})
     payload.setdefault("meta", {})
     encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

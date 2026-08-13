@@ -151,6 +151,8 @@ This order is reproducible with `scripts/rank_results.py` and remains consistent
 
 PhD Radar first reports the effective request and coverage: selected and failed sources, Web queries, raw leads, official returns, duplicates, exclusions, verified results, funding confirmations, deadlines, QS outcomes, and incomplete checks. It then presents the ranked shortlist with official and application links. After the first setup and every later search, it automatically generates, mounts, and opens the dashboard in the current Codex task. This also happens for zero-result searches so the empty state, exclusions, and coverage gaps remain inspectable. Set `dashboard.auto_open` to `false` through conversation to generate without opening.
 
+To improve recall without weakening evidence standards, first-time setup uses 3–5 adaptive intake rounds and confirms `discipline_mode` (`lab_based`, `faculty_based`, or `hybrid`), application cycle, core and adjacent topics, methods/domains, geography, funding policy, and result scale. Broad searches target 20 formal recommendations from a discovery pool of up to 80 program, vacancy, advisor, lab, and funded-route candidates. Results with named unresolved critical facts appear separately under **Needs confirmation** and never enter the formal rank sequence. Every worthwhile candidate with an official project or application route remains available; scores below `dashboard.collapse_below_score` (default `8.0`) are collapsed by default.
+
 The skill generates a self-contained, read-only HTML dashboard:
 
 ```powershell
@@ -165,13 +167,15 @@ The dashboard provides:
 - ranked cards with title, institution, location, deadline, funding, PI/contact, recommendation reason, warnings, and official links;
 - expandable field-level evidence;
 - explicit missing-link, unknown-evidence, empty, and partial-coverage states;
+- a separate needs-confirmation section with provisional scores and named evidence gaps;
+- a default-collapsed “Other worthwhile projects” section containing formal and provisional results below 8.0;
 - desktop and mobile layouts with no external runtime dependency.
 
 The Web dashboard intentionally displays one overall score, such as `9.1 / 10`. Component scores remain available to the screening and explanation pipeline but are omitted from the card interface to keep decisions readable.
 
 ## Scope and safety
 
-PhD Radar searches public information, verifies evidence, and creates local reports. It does not bypass login, CAPTCHA, paywalls, or access controls, and it never submits an application. Vacancy details change; always treat the linked official application page as authoritative before applying.
+PhD Radar searches public information, verifies evidence, and creates local reports. Project, application, PI, and evidence actions must use real official URLs discovered in the current run. Reserved documentation domains such as `example.com`, `example.org`, and `example.net` fail the quality gate, and sample fixture data cannot be delivered as user results. It does not bypass login, CAPTCHA, paywalls, or access controls, and it never submits an application. Vacancy details change; always treat the linked official application page as authoritative before applying.
 
 ## Repository layout
 

@@ -2,6 +2,7 @@
 /output/
 /outputs/
 /docs/
+/skill-src/phd-radar/output/
 *.zip
 
 # Vendored or reference repositories

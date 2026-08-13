@@ -8,6 +8,10 @@ Capture:
 
 ```yaml
 regions: []
+intake_version: 2
+intake_complete: false
+discipline_mode: hybrid
+application_cycle: null
 institutions: []
 topics: []
 methods: []
@@ -23,7 +27,11 @@ exclusions: []
 source_overrides: []
 web_discovery: true
 result_target: 20
-discovery_candidate_cap: 60
+discovery_candidate_cap: 80
+advisor_limit_per_program: 4
+candidate_visibility:
+  show_needs_confirmation: true
+  show_research_signals: false
 application_routes: [advertised_position, funded_program_route]
 institution_screen:
   enabled: true

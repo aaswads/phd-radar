@@ -4,7 +4,7 @@ Use this reference for every search when the verified result set could be reduce
 
 ## Coverage target
 
-Read `result_target` from the profile; default to 20. For a broad regional or multi-school search, build a discovery roster of roughly `result_target * 3`, capped at 60 unique candidates. For one named institution, cover the complete plausible official roster rather than padding to a quota. Targets guide effort; they are not promised result counts.
+Read `result_target` from the profile; default to 20. For a broad regional or multi-school search, build a discovery roster of roughly `result_target * 4`, capped at 80 unique candidates. For one named institution, cover the complete plausible official roster rather than padding to a quota. Targets guide effort; they are not promised result counts.
 
 Do not stop after the first few verified matches. Continue until one of these is true:
 
@@ -21,7 +21,7 @@ Run low-cost discovery before deep verification:
 
 1. **Vacancy pass:** configured vacancy sources, university job portals, EURAXESS or regional equivalents, and targeted open Web queries.
 2. **Institution/program pass:** official doctoral-program, graduate-school, department, research-center, and funding pages matching the target field.
-3. **Advisor/lab pass:** official faculty/lab rosters plus current personal/lab pages; record recruiting signals and representative recent work only.
+3. **Advisor/lab pass:** official faculty/lab rosters plus current personal/lab pages; for each plausible program keep up to the configured advisor limit (default four), recording recruiting signals and representative recent work only.
 4. **Project/funder pass:** official ERC, MSCA, CORDIS, national funder, consortium, and project pages that may lead back to recruiting institutions or PIs.
 5. **Publication/directory expansion:** use Scholar, dblp, OpenReview, ORCID, DOI/publisher records, and field directories to discover current researchers; return to official institution/program/vacancy pages before formal admission.
 
@@ -42,7 +42,7 @@ Generate at least one exact-topic query, one synonym-expanded query, one method/
 
 Deduplicate candidates by normalized institution + opportunity/program identity and stable IDs. Rank the broad pool by cheap relevance only to choose verification order; do not publish that preliminary order or score.
 
-Deep-verify enough candidates to reach the formal target or a stop condition. For each candidate, perform official return, QS screening, funding/deadline/eligibility checks, PI/program mapping, recent-research profiling, and lab audit. Preserve excluded candidates and exact reasons.
+Deep-verify enough candidates to reach the formal target or a stop condition. Verify in batches: first route/open-status/funding eligibility, then PI/program mapping, recent-research profiling, and lab audit. Preserve `needs_confirmation` candidates rather than discarding them when one named critical fact remains unresolved. Preserve excluded candidates and exact reasons.
 
 When the profile permits both routes, distinguish:
 

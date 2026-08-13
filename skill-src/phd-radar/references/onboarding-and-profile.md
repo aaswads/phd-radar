@@ -4,13 +4,16 @@ Use this reference when no saved profile exists, when the user asks what informa
 
 ## First-use conversation
 
-Do not begin a broad search with an empty profile. Give the user one copyable reply block and show which values are required:
+Read `progressive-intake.md` and run its 3–5 adaptive rounds. Use the following block as a compact fallback only when the user explicitly prefers one-message setup:
 
 ```text
 这是首次使用。请直接复制下面内容并填写；不确定的项目可以留空，我会使用下方默认值。你的回复将作为确认，并保存为以后自动复用的永久配置。
 
 目标地区（必填，例如：荷兰、德国、北欧、英国）：
 研究主题（必填，例如：Human-AI Interaction、AI Agent Evaluation、Human Factors）：
+可接受的相邻主题（推荐）：
+指导模式（lab_based / faculty_based / hybrid；默认 hybrid）：
+申请周期或入学时间（推荐）：
 QS 目标学科（推荐，例如：Computer Science and Information Systems、Psychology）：
 申请背景（推荐：当前/最高学历、专业、毕业时间）：
 方法与技能（推荐：用户实验、统计、Python、LLM/Agent evaluation）：
@@ -35,7 +38,8 @@ Read the executable defaults with `python scripts/profile_store.py defaults`, th
 - lab signals: recent research, ERC/MSCA, doctoral outputs/destinations, external collaboration;
 - output language: Chinese;
 - dashboard: generate and open automatically after the first and later searches; show one overall 10-point score only.
-- formal result target: 20; broad discovery roster target: about 60 candidates;
+- formal result target: 20; broad discovery roster target: up to 80 candidates;
+- provisional visibility: show promising `needs_confirmation` routes separately by default;
 - application routes: specific advertised positions plus verified funded-program routes.
 
 Present recommended terms as examples, not assumed facts. Useful topic vocabulary includes `Human-AI Interaction`, `AI Agent Evaluation`, `Agent Harness`, `Human Factors`, `Trust in Automation`, `Safety-Critical Systems`, `HCI`, and `LLM Evaluation`. Useful method vocabulary includes `user study`, `mixed methods`, `experiment design`, `statistics`, `Python`, `R`, `eye tracking`, and `simulation`. Map user wording to canonical terms while retaining the original wording in `profile_notes`. When the user's research topic could map to multiple QS subjects, show the candidate official labels and ask one focused follow-up.

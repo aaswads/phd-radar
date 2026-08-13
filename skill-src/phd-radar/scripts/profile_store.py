@@ -10,6 +10,10 @@ from pathlib import Path
 
 DEFAULT_PROFILE = {
     "profile_name": "default",
+    "intake_version": 2,
+    "intake_complete": False,
+    "discipline_mode": "hybrid",
+    "application_cycle": None,
     "regions": [],
     "topics": [],
     "methods": [],
@@ -23,7 +27,9 @@ DEFAULT_PROFILE = {
     "source_overrides": [],
     "web_discovery": True,
     "result_target": 20,
-    "discovery_candidate_cap": 60,
+    "discovery_candidate_cap": 80,
+    "advisor_limit_per_program": 4,
+    "candidate_visibility": {"show_needs_confirmation": True, "show_research_signals": False},
     "application_routes": ["advertised_position", "funded_program_route"],
     "institution_screen": {
         "enabled": True,
@@ -46,7 +52,7 @@ DEFAULT_PROFILE = {
         "external_partner_keywords": [],
     },
     "output_language": "zh-CN",
-    "dashboard": {"generate": True, "auto_open": True},
+    "dashboard": {"generate": True, "auto_open": True, "collapse_below_score": 8.0},
 }
 
 
@@ -80,6 +86,8 @@ def validate_profile(profile):
         value = profile.get(field)
         if not isinstance(value, list) or not any(str(item).strip() for item in value):
             raise ValueError(f"{field} must contain at least one value")
+    if profile.get("discipline_mode") not in {"lab_based", "faculty_based", "hybrid"}:
+        raise ValueError("discipline_mode must be lab_based, faculty_based, or hybrid")
 
 
 def save_profile(path, profile, preserve_created=None):
@@ -124,13 +132,15 @@ def main():
         raise ValueError("Profile input must be a JSON object")
     if args.action == "set":
         merged = deep_merge(DEFAULT_PROFILE, incoming)
+        merged["intake_complete"] = True
         validate_profile(merged)
         saved = save_profile(target, merged)
     else:
         if not target.exists():
             raise FileNotFoundError("Cannot patch before the first profile is saved")
         current = read_json(target)
-        merged = deep_merge(current, incoming)
+        merged = deep_merge(DEFAULT_PROFILE, current)
+        merged = deep_merge(merged, incoming)
         validate_profile(merged)
         saved = save_profile(target, merged, current.get("created_at"))
     print(json.dumps(saved, ensure_ascii=False, indent=2))

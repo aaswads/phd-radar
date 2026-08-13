@@ -1,5 +1,6 @@
 {
   "meta": {
+    "fixture_only": true,
     "title": "Human Factors / HMI 博士机会",
     "subtitle": "欧洲岗位制与全额资助项目 · 已完成官方页面核验 · 按推荐度排序",
     "generated_at": "2026-08-13 15:40 CST",
@@ -13,6 +14,36 @@
     "pending_leads": 6,
     "regions": 4
   },
+  "needs_confirmation": [
+    {
+      "opportunity_id": "demo-uk-005",
+      "title": "Human-Centred AI for Safety-Critical Operations",
+      "institution": "Northern Systems University",
+      "department": "School of Computing and Engineering",
+      "country": "United Kingdom",
+      "city": "Newcastle",
+      "opportunity_type": "Funded PhD programme route",
+      "pi_or_contact": "Prof. Maya Stone",
+      "pi_summary": "近期研究覆盖 Human-AI teaming、操作员决策与安全关键系统。",
+      "official_detail_url": "",
+      "official_application_url": "",
+      "pi_profile_url": "",
+      "deadline": "2026-12-01",
+      "funding_text": "Studentship route published; international tuition coverage needs confirmation",
+      "research_fit_raw": 8.95,
+      "eligibility_score_raw": 8.5,
+      "funding_confidence_raw": 6.2,
+      "overall_match_raw": 8.42,
+      "unresolved_critical_fields": ["international tuition waiver", "PI recruiting for 2027"],
+      "recommendation_reason": "研究方向和方法高度匹配，已有官方项目及申请通道；确认国际生学费覆盖和导师本轮招生后可升级为正式推荐。",
+      "institution_screen": {"outcome":"pass","provider":"QS","year":2026,"overall":{"rank":180},"subjects":[{"name":"Computer Science and Information Systems","rank":92}]},
+      "lab_screen": {"status":"adequate","recent_research":"strong","eu_funding":"unknown","doctoral_outputs":"adequate","external_collaboration":"adequate"},
+      "field_evidence": [
+        {"field":"deadline","status":"confirmed","value":"2026-12-01","source_url":""},
+        {"field":"funding","status":"unknown","value":"International fee coverage not stated","source_url":""}
+      ]
+    }
+  ],
   "results": [
     {
       "opportunity_id": "demo-nl-001",
@@ -24,9 +55,9 @@
       "opportunity_type": "Doctoral Candidate",
       "pi_or_contact": "Prof. Elena van Meer",
       "pi_summary": "研究聚焦自动化信任、情境意识与安全关键系统中的人机协同。",
-      "official_detail_url": "https://example.org/project/nl-001",
-      "official_application_url": "https://example.org/apply/nl-001",
-      "pi_profile_url": "https://example.org/people/elena-van-meer",
+      "official_detail_url": "",
+      "official_application_url": "",
+      "pi_profile_url": "",
       "deadline": "2026-10-01",
       "funding_text": "4-year salaried doctoral employment",
       "research_fit_raw": 9.35,
@@ -38,8 +69,8 @@
       "lab_screen": {"status":"strong","recent_research":"strong","eu_funding":"confirmed","doctoral_outputs":"adequate","external_collaboration":"strong"},
       "recommendation_reason": "研究问题与 Human-Automation Interaction 高度一致，同时覆盖航空、安全关键系统和实验方法；岗位资金与申请路径清晰。",
       "field_evidence": [
-        {"field":"deadline","status":"confirmed","value":"2026-10-01","source_url":"https://example.org/project/nl-001"},
-        {"field":"funding","status":"confirmed","value":"Salaried employment","source_url":"https://example.org/project/nl-001"}
+        {"field":"deadline","status":"confirmed","value":"2026-10-01","source_url":""},
+        {"field":"funding","status":"confirmed","value":"Salaried employment","source_url":""}
       ]
     },
     {
@@ -52,9 +83,9 @@
       "opportunity_type": "PhD Student",
       "pi_or_contact": "Dr. Karin Lind",
       "pi_summary": "近期工作集中于自动驾驶中的信任校准、接管行为与多模态界面。",
-      "official_detail_url": "https://example.org/project/se-002",
-      "official_application_url": "https://example.org/apply/se-002",
-      "pi_profile_url": "https://example.org/people/karin-lind",
+      "official_detail_url": "",
+      "official_application_url": "",
+      "pi_profile_url": "",
       "deadline": "2026-09-21",
       "funding_text": "Full-time doctoral employment under collective agreement",
       "research_fit_raw": 9.08,
@@ -66,8 +97,8 @@
       "lab_screen": {"status":"adequate","recent_research":"strong","eu_funding":"confirmed","doctoral_outputs":"adequate","external_collaboration":"adequate"},
       "recommendation_reason": "HMI、HAI 与自动驾驶应用域匹配突出，PI 近期方向与项目主题连续，适合作为高优先级申请。",
       "field_evidence": [
-        {"field":"deadline","status":"confirmed","value":"2026-09-21","source_url":"https://example.org/project/se-002"},
-        {"field":"funding","status":"confirmed","value":"Employment contract","source_url":"https://example.org/project/se-002"}
+        {"field":"deadline","status":"confirmed","value":"2026-09-21","source_url":""},
+        {"field":"funding","status":"confirmed","value":"Employment contract","source_url":""}
       ]
     },
     {
@@ -80,9 +111,9 @@
       "opportunity_type": "Research Associate / PhD",
       "pi_or_contact": "Prof. Lukas Weber",
       "pi_summary": "以认知工程、复杂系统控制与操作员韧性为核心研究线索。",
-      "official_detail_url": "https://example.org/project/de-003",
-      "official_application_url": "https://example.org/apply/de-003",
-      "pi_profile_url": "https://example.org/people/lukas-weber",
+      "official_detail_url": "",
+      "official_application_url": "",
+      "pi_profile_url": "",
       "deadline": "2026-10-15",
       "funding_text": "TV-L E13, 75% appointment",
       "research_fit_raw": 8.82,
@@ -94,8 +125,8 @@
       "lab_screen": {"status":"adequate","recent_research":"adequate","eu_funding":"unknown","doctoral_outputs":"adequate","external_collaboration":"strong"},
       "recommendation_reason": "认知工程与安全关键系统匹配良好，应用域从航空迁移到轨道交通具有合理叙事；需进一步确认德语是否为日常工作要求。",
       "field_evidence": [
-        {"field":"deadline","status":"confirmed","value":"2026-10-15","source_url":"https://example.org/project/de-003"},
-        {"field":"funding","status":"confirmed","value":"TV-L E13 75%","source_url":"https://example.org/project/de-003"}
+        {"field":"deadline","status":"confirmed","value":"2026-10-15","source_url":""},
+        {"field":"funding","status":"confirmed","value":"TV-L E13 75%","source_url":""}
       ]
     },
     {
@@ -108,8 +139,8 @@
       "opportunity_type": "Doctoral Researcher",
       "pi_or_contact": "Dr. Amélie Roux",
       "pi_summary": "研究结合 XR、训练迁移和航空人因评估。",
-      "official_detail_url": "https://example.org/project/fr-004",
-      "official_application_url": "https://example.org/apply/fr-004",
+      "official_detail_url": "",
+      "official_application_url": "",
       "pi_profile_url": "",
       "deadline": null,
       "funding_text": "Doctoral contract; amount pending official confirmation",
@@ -122,8 +153,8 @@
       "lab_screen": {"status":"incomplete","recent_research":"adequate","eu_funding":"unknown","doctoral_outputs":"unknown","external_collaboration":"adequate"},
       "recommendation_reason": "XR 与航空人因方向相关，但 Funding 金额和截止日期尚未由官方页面明确，适合列入重点核验而非立即投入完整申请。",
       "field_evidence": [
-        {"field":"deadline","status":"unknown","value":null,"source_url":"https://example.org/project/fr-004"},
-        {"field":"funding","status":"unknown","value":"Doctoral contract mentioned","source_url":"https://example.org/project/fr-004"}
+        {"field":"deadline","status":"unknown","value":null,"source_url":""},
+        {"field":"funding","status":"unknown","value":"Doctoral contract mentioned","source_url":""}
       ]
     }
   ]

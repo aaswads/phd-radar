@@ -48,13 +48,18 @@ Keep effective request, start/end time, selected sources, Web queries by region,
 
 ## DashboardPacket
 
-Use a JSON object with `meta`, `summary`, and `results`. `meta` may carry title, subtitle, generated time, coverage label, and footer. `summary` carries already reconciled counts. `results` carries ranked verified `Opportunity` records only. See `dashboard-contract.md` for card behavior.
+Use a JSON object with `meta`, `summary`, `results`, and `needs_confirmation`. `meta` may carry title, subtitle, generated time, coverage label, footer, and `collapse_below_score`. `summary` carries already reconciled counts. `results` carries ranked verified `Opportunity` records only. `needs_confirmation` carries promising official routes with named unresolved critical fields and provisional scores; it never shares formal ranks. Both arrays retain worthwhile candidates below the configured collapse threshold for the Dashboard's collapsed section. See `dashboard-contract.md` for card behavior.
+
+## RunPacket
+
+Store `profile_snapshot`, `source_runs`, `discovery_leads`, `formal_results`, `needs_confirmation`, `research_signals`, `excluded`, `quality`, and `summary`. Each candidate appears in exactly one terminal tier. Run `scripts/check_run_packet.py` before building the Dashboard.
 
 ## Invariants
 
 - One verified opportunity has one stable ID and may retain many discovery sources.
 - Objective evidence and semantic scores remain separate.
 - Discovery leads without official verification never receive a formal rank.
+- `needs_confirmation` candidates remain visible but never enter the formal ranked sequence.
 - Opportunities that fail a configured institution or subject gate never receive a formal rank; `manual_review` items remain separate.
 - Counts reconcile from raw leads through deduplicated verified opportunities.
 - All outputs preserve the same ranked opportunity-ID sequence.

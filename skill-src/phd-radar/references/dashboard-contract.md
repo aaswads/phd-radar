@@ -27,7 +27,9 @@ Use `unknown` or a disabled action when a URL or fact is absent. Never invent a 
 2. Search/verification summary metrics.
 3. Filters for text, region, minimum score, QS gate outcome, and lab-audit status.
 4. Cards in the exact deterministic rank order.
-5. Coverage and freshness disclaimer.
+5. A visually separate `needs_confirmation` section with provisional scores and named evidence gaps for items at or above the collapse threshold.
+6. A default-collapsed “其他值得查看的项目” section containing every worthwhile formal or provisional item below the configured threshold, default `8.0`.
+7. Coverage and freshness disclaimer.
 
 Keep charts optional. Prefer directly actionable counts and cards over decorative analytics.
 
@@ -40,6 +42,9 @@ Project content owns the page. Do not display S/A/B/C grades or component resear
 - Keep the dashboard read-only. Application-state writes belong to a separately confirmed control surface.
 - Render loading, empty, missing-link, unknown-evidence, and partial-coverage states explicitly.
 - Preserve the same opportunity-ID order as conversation, JSON, and Excel outputs.
+- Never merge provisional candidates into the formal ranked sequence; label their score `暂定匹配分` and show unresolved critical fields.
+- Treat score as presentation priority, not a deletion rule. Preserve every worthwhile official-route candidate; place scores below `dashboard.collapse_below_score` in the collapsed section and maintain deterministic descending order there.
+- Accept only real `http` or `https` official URLs. Disable absent actions and reject `example.com`, `example.org`, `example.net`, or their subdomains. Never use the sample fixture as a user result packet.
 
 ## Visual system
 
@@ -63,4 +68,4 @@ Reuse an already-running server when possible. The server is read-only by conven
 
 Probe the mounted URL, then open it in the current Codex task with `codex_app__open_in_codex` when available. Generate and open an empty-state Dashboard when there are no verified formal results so coverage and exclusion outcomes remain visible. Respect an explicit saved `dashboard.auto_open: false` by generating without opening.
 
-Completion: the page loads without external dependencies, every card has valid or explicitly unavailable actions, filters work, the visible order matches the ranked input packet, and the mounted page opens automatically unless disabled.
+Completion: the page loads without external dependencies, every card has valid or explicitly unavailable actions, reserved example domains are not clickable, every worthwhile item remains reachable, sub-8.0 items start collapsed, filters work, the visible order matches the ranked input packet, and the mounted page opens automatically unless disabled.

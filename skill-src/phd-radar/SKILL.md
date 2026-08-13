@@ -17,9 +17,9 @@ Completion: every claimed search, saved setting, and registered source correspon
 
 ## Onboard and reuse the user profile
 
-Before resolving a search, check for an existing profile with `python scripts/profile_store.py show`. If it returns `PROFILE_NOT_FOUND`, read [references/onboarding-and-profile.md](references/onboarding-and-profile.md) and run the first-use conversation. Its form states that the completed reply confirms persistence; save that reply merged with executable defaults and read it back. The first configuration becomes the user's persistent `default` profile.
+Before resolving a search, check for an existing profile with `python scripts/profile_store.py show`. If it returns `PROFILE_NOT_FOUND`, read [references/progressive-intake.md](references/progressive-intake.md) and run the adaptive first-use intake. Save only after the user confirms the final summary; `profile_store.py set` marks it complete. The first configuration becomes the user's persistent `default` profile.
 
-For later searches, start from that profile and apply current-turn overrides. Preview and confirm persistent patches; apply explicit temporary overrides without changing saved state. Read the saved profile back after every write. Never repeat the full onboarding form when a usable profile already exists.
+For later searches, start from that profile and ask only what changed. Preview and confirm persistent patches; apply explicit temporary overrides without changing saved state. Read the saved profile back after every write. Re-run only the affected intake branch when values are missing, contradictory, or stale for a new application cycle.
 
 Treat a legacy profile with no `dashboard` object as `dashboard.generate: true` and `dashboard.auto_open: true`. This backward-compatible default does not require a profile rewrite before the next search.
 
@@ -56,13 +56,13 @@ Read [references/conversation-contract.md](references/conversation-contract.md) 
 
 ### 1. Resolve the effective request
 
-Extract regions, topics, methods, application domains, opportunity types, funding requirements, applicant constraints, language, deadline rules, exclusions, institution/subject ranking thresholds, lab-audit scope, output preferences, and one-off versus persistent intent.
+Extract discipline mode, application cycle, regions, primary and adjacent topics, methods, application domains, opportunity types, funding requirements, candidate-visibility policy, applicant constraints, language, deadline rules, exclusions, institution/subject ranking thresholds, lab-audit scope, output preferences, and one-off versus persistent intent.
 
 Use the current turn first, then a saved profile, then disclosed defaults. Ask only for a missing value that would materially change the search. Echo a compact effective request before searching.
 
 Read [references/institution-and-lab-screen.md](references/institution-and-lab-screen.md) whenever an institution, subject-ranking, publication-window, grant, doctoral-output, alumni-destination, or external-partner screen is enabled.
 
-Completion: every effective field traces to the user's words, a saved profile, or an explicitly disclosed default; ranking subjects use official labels; no one-off value is persisted.
+Completion: intake is confirmed, every effective field traces to the user's words, a saved profile, or an explicitly disclosed default; ranking subjects use official labels; no one-off value is persisted.
 
 ### 2. Build a two-channel plan for every region
 
@@ -79,21 +79,29 @@ Completion: every region has both a configured-source plan and an open-Web query
 
 ### 3. Discover leads
 
-Run the breadth-first funnel: vacancy sources, institution/program pages, advisor/lab rosters, project/funder sources, then publication/directory expansion. For broad searches, target roughly three unique discovery candidates per requested formal result, capped at 60. Record channel, source/query, URL, title, snippet, discovered time, and terminal status. Treat search snippets, aggregators, news, lab pages, social posts, scholarly directories, and funding pages as leads rather than vacancy proof.
+Run the breadth-first funnel: vacancy sources, institution/program pages, advisor/lab rosters, project/funder sources, then publication/directory expansion. For broad searches, target roughly four unique discovery candidates per requested formal result, capped at 80. Match through exact topics, adjacent topics, method + application-domain combinations, and advisor/lab continuity; do not require every profile keyword in one page. Record channel, source/query, URL, title, snippet, discovered time, and terminal status. Treat search snippets, aggregators, news, lab pages, social posts, scholarly directories, and funding pages as leads rather than vacancy proof.
 
 Deep-verify candidates in batches. When a candidate is excluded by QS, funding, deadline, eligibility, or official-return failure, continue from the discovery roster until the requested formal-result target or a documented saturation/budget stop condition is reached. Support both specific advertised positions and verified funded-program application routes when the profile permits them.
 
 Completion: every planned source and query ends as `success`, `zero_results`, `blocked`, `failed`, `skipped`, or `budget_limited`; leads remain separate from verified opportunities; a small final set has a reconciled discovery-to-exclusion funnel.
 
+### 3a. Research independent slices
+
+Read [references/research-and-quality-gate.md](references/research-and-quality-gate.md). Research program/vacancy discovery, program/admission/funding facts, PI/advisor fit, requested outcomes/lab evidence, and an independent critical-claim check as separate slices. Execute independent slices concurrently when the runtime supports it; otherwise keep separate statuses and evidence collections.
+
+Completion: access failures and partial slices remain attached to their candidates; stable program, advisor, and opportunity identities survive reconciliation.
+
 ### 4. Return to official pages
 
 Follow each promising lead to the most specific official vacancy or project page. Verify opportunity existence, institution, region, type, open status, deadline, funding or salary, applicant eligibility, working language, PI/contact, and official application link field by field.
 
-Use `confirmed`, `unknown`, or `conflicting`; preserve discovery and official URLs separately. Prefer the official page when a snippet or aggregator conflicts. Keep unverified vacancy leads out of the ranked result set. Put PI/project/funding signals without a vacancy in a separate research queue.
+Use `confirmed`, `unknown`, or `conflicting`; preserve discovery and official URLs separately. Prefer the official page when a snippet or aggregator conflicts. Classify every worthwhile candidate with a positive official program, project, vacancy, scholarship, or recruiting route as either `formal` or `needs_confirmation`, regardless of score; do not drop it merely because its score is below 8.0. Put PI/project/funding signals without an application route in a separate research queue.
+
+Every external action must point to the real official route discovered in this run. Treat `examples/dashboard-sample.json` as a renderer-only fixture: never copy its records or URLs into a user run. Reserved documentation domains such as `example.com`, `example.org`, and `example.net` are invalid evidence and invalid actions.
 
 Read [references/evidence-policy.md](references/evidence-policy.md) for admission and conflict rules.
 
-Completion: every ranked opportunity has a traceable discovery-to-official evidence chain; every other lead is classified as pending, no-official-source, research-signal, duplicate, expired, excluded, or irrelevant.
+Completion: every ranked opportunity has a traceable discovery-to-official evidence chain; every other lead is classified as needs-confirmation, pending, no-official-source, research-signal, duplicate, expired, excluded, or irrelevant.
 
 ### 5. Apply institution and lab screens
 
@@ -130,7 +138,19 @@ Display scores rounded to one decimal. Thus 9.1 precedes 9.0. Use [scripts/rank_
 
 Completion: ranks are consecutive and conversation, JSON, Excel, and any dashboard use the same opportunity-ID order.
 
-### 8. Report statistics, then results
+### 8. Check the run packet
+
+Write the tiered run packet from [references/research-and-quality-gate.md](references/research-and-quality-gate.md) and execute:
+
+```powershell
+python scripts/check_run_packet.py <run-packet.json> --output <quality-report.json>
+```
+
+Fix structural errors before rendering. `reserved_example_url` is always an error: replace it with the verified official page or leave the optional action unavailable. Preserve warnings and unresolved claims in the report and Dashboard.
+
+Completion: the checker passes, every candidate belongs to exactly one tier, and formal ranks contain no provisional candidates.
+
+### 9. Report statistics, then results
 
 Report:
 
@@ -142,8 +162,9 @@ Report:
 - new, updated, reopened, and expired counts when history exists;
 - failures, unknowns, and coverage gaps.
 - QS overall/subject pass, preferred, manual-review, and excluded counts; lab-audit strong/adequate/weak/incomplete counts.
+- formal, needs-confirmation, research-signal, and excluded counts, with the named critical gaps for provisional candidates.
 
-Then show the ranked verified results with rank, grade, overall score, institution, title, PI, region, research/eligibility/funding scores, funding, deadline, QS overall and target-subject status, lab-audit status, discovery channel, official verification page, application link, and recommendation reason.
+Then show all worthwhile formal and needs-confirmation projects. Keep every item at or above `dashboard.collapse_below_score` (default `8.0`) expanded in its appropriate section; retain lower-scoring items in deterministic score order inside a default-collapsed “其他值得查看的项目” section. Show the provisional overall score, institution/program/PI, official route, and exactly what remains to confirm. Keep research signals and exclusions in statistics or an expandable audit section.
 
 Distinguish `zero_results` from incomplete coverage. Do not make the user open an artifact to understand the main findings.
 
