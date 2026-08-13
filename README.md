@@ -47,7 +47,7 @@ PhD Radar distinguishes persistent wording such as “from now on”, “default
 On the first run, PhD Radar checks for a saved `default` profile. If none exists, it asks for one copyable configuration reply. Two fields are required:
 
 - **Target regions**, such as the Netherlands, Germany, the Nordic countries, or the UK.
-- **Research topics**, such as Human-AI Interaction, AI Agent Evaluation, or Human Factors.
+- **Research topics**, such as solid-state batteries, electrochemical energy storage, or computational materials science.
 
 It also accepts:
 
