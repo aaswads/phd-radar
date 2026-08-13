@@ -63,12 +63,12 @@ It also accepts:
 Example first-time reply:
 
 ```text
-Target regions: Netherlands, Germany, Denmark, Sweden
-Research topics: Human-AI Interaction, LLM agent evaluation
-QS subjects: Computer Science and Information Systems; Psychology
-Background: MSc in Human Factors, graduating June 2027
-Methods and skills: user studies, statistics, Python, mixed methods
-Application domains: aviation and safety-critical systems
+Target regions: Germany, Netherlands, Belgium, Sweden
+Research topics: solid-state batteries, electrochemical energy storage
+QS subjects: Materials Sciences; Engineering - Chemical
+Background: MSc in Chemical Engineering, graduating June 2027
+Methods and skills: electrochemical impedance spectroscopy, materials characterization, Python
+Application domains: electric vehicles and grid-scale energy storage
 Language constraints: English-speaking positions only
 Earliest start: September 2027
 Exclude: self-funded positions
@@ -134,15 +134,6 @@ The skill does not impose one universal hidden weighting formula. The overall we
 
 Scores do not override hard conflicts. An expired deadline, failed funding requirement, explicit ineligibility, unmet required language, or failed configured QS threshold prevents formal recommendation. Unknown facts remain unknown rather than receiving optimistic points.
 
-Default grade bands are:
-
-- **S:** overall, research, and eligibility at least 8.5; funding at least 8.0; all gates pass.
-- **A:** overall, research, and eligibility at least 7.5; acceptable funding confirmed; no disqualifying gate.
-- **B:** overall 6.0-7.4, or a meaningful but explainable topic/method transition.
-- **C:** weak core fit, a hard conflict, unacceptable funding, expired status, or poor application value.
-
-Grades are explanatory labels. Numeric ordering controls the final rank.
-
 ### Deterministic order
 
 Results are sorted by:
@@ -176,7 +167,7 @@ The dashboard provides:
 - explicit missing-link, unknown-evidence, empty, and partial-coverage states;
 - desktop and mobile layouts with no external runtime dependency.
 
-The Web dashboard intentionally displays one overall score, such as `9.1 / 10`. Component scores and S/A/B/C labels remain available to the screening and explanation pipeline but are omitted from the card interface to keep decisions readable.
+The Web dashboard intentionally displays one overall score, such as `9.1 / 10`. Component scores remain available to the screening and explanation pipeline but are omitted from the card interface to keep decisions readable.
 
 ## Scope and safety
 
@@ -196,9 +187,16 @@ skill-src/phd-radar/
 
 ## Validate
 
+Run the bundled deterministic ranking self-test:
+
+```powershell
+python .\skill-src\phd-radar\scripts\rank_results.py --self-test
+```
+
+Codex installations include an optional `quick_validate.py` utility under the preinstalled `skill-creator` system skill. It checks Skill packaging rules such as YAML frontmatter, required fields, and folder naming. It is a development-time structure check, not a PhD Radar runtime dependency. Contributors who have that utility installed can run:
+
 ```powershell
 python "$HOME\.codex\skills\.system\skill-creator\scripts\quick_validate.py" .\skill-src\phd-radar
-python .\skill-src\phd-radar\scripts\rank_results.py --self-test
 ```
 
 ## License

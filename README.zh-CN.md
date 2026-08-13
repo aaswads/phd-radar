@@ -63,12 +63,12 @@ PhD Radar 会区分“以后、默认、保存”等永久修改表达与“这�
 首次配置示例：
 
 ```text
-目标地区：荷兰、德国、丹麦、瑞典
-研究主题：Human-AI Interaction、LLM Agent Evaluation
-QS 目标学科：Computer Science and Information Systems、Psychology
-申请背景：Human Factors 硕士，预计 2027 年 6 月毕业
-方法与技能：用户实验、统计、Python、混合研究方法
-应用领域：航空与安全关键系统
+目标地区：德国、荷兰、比利时、瑞典
+研究主题：固态电池、电化学储能
+QS 目标学科：Materials Sciences、Engineering - Chemical
+申请背景：化学工程硕士，预计 2027 年 6 月毕业
+方法与技能：电化学阻抗谱、材料表征、Python
+应用领域：电动汽车与大规模电网储能
 语言与资格限制：只考虑英语岗位
 最早入学时间：2027 年 9 月
 必须排除：需要自费的项目
@@ -134,15 +134,6 @@ QS 目标学科：Computer Science and Information Systems、Psychology
 
 高分不能覆盖硬性冲突。截止日期已过、资助不符合要求、明确不具备申请资格、无法满足必要语言要求，或未通过已配置的 QS 门槛，都会阻止正式推荐。未知信息保持为“未知”，不会被乐观加分。
 
-默认等级划分为：
-
-- **S：**综合、研究匹配和申请资格均至少 8.5，资助至少 8.0，且所有硬门槛通过。
-- **A：**综合、研究匹配和申请资格均至少 7.5，资助已确认可接受，且没有淘汰性门槛。
-- **B：**综合分 6.0-7.4，或存在有意义且可解释的主题/方法转向。
-- **C：**核心匹配较弱、存在硬冲突、资助不可接受、职位已过期或申请价值较低。
-
-等级只用于解释，最终顺序以数值排序为准。
-
 ### 确定性排序
 
 结果依次按照以下规则排序：
@@ -176,7 +167,7 @@ python .\skill-src\phd-radar\scripts\render_dashboard.py results.json `
 - 明确的链接缺失、证据未知、空结果和覆盖不完整状态；
 - 无外部运行依赖的桌面与移动端布局。
 
-Web 仪表盘有意只展示一个综合分，例如 `9.1 / 10`。研究匹配、申请资格、资助可信度和 S/A/B/C 等级仍保留在筛选与解释流程中，但不在卡片界面显示，以保持阅读和决策清晰。
+Web 仪表盘有意只展示一个综合分，例如 `9.1 / 10`。研究匹配、申请资格和资助可信度等分项仍保留在筛选与解释流程中，但不在卡片界面显示，以保持阅读和决策清晰。
 
 ## 使用边界与安全
 
@@ -196,9 +187,16 @@ skill-src/phd-radar/
 
 ## 校验
 
+运行项目自带的确定性排序自测：
+
+```powershell
+python .\skill-src\phd-radar\scripts\rank_results.py --self-test
+```
+
+Codex 安装中还提供一个可选的 `quick_validate.py` 工具，它位于预装的 `skill-creator` 系统技能内，用于检查 YAML Frontmatter、必填字段和文件夹命名等 Skill 封装规范。它只是开发阶段的结构校验工具，并不是 PhD Radar 的运行依赖。安装了该工具的贡献者可以执行：
+
 ```powershell
 python "$HOME\.codex\skills\.system\skill-creator\scripts\quick_validate.py" .\skill-src\phd-radar
-python .\skill-src\phd-radar\scripts\rank_results.py --self-test
 ```
 
 ## 开源许可证
