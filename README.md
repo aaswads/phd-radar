@@ -12,6 +12,8 @@ PhD Radar is a Codex skill for discovering, verifying, screening, scoring, ranki
 - Returns to official university, institute, employer, project, or application pages for verification.
 - Applies optional QS institution/subject gates and research-group evidence checks.
 - Scores verified results on a 0.0-10.0 scale and ranks them deterministically.
+- Compiles each request into a versioned, hashed SearchPlan with fixed query families, source quotas, and replayable execution order.
+- Uses a SQLite candidate ledger for stable refreshes, carry-forward candidates, auditable expiry, and new/updated/reopened metrics.
 - Reports search coverage and exclusions, then automatically generates, mounts, and opens a self-contained HTML dashboard.
 
 ## Install
@@ -102,6 +104,8 @@ Unless the user changes them, first-time setup uses:
 These are starting defaults, not claims about the user. They can be changed conversationally.
 
 ## Search sources and verification
+
+Search execution has three modes: `stable_refresh` (default, reuses the ledger), `replay` (replays a saved snapshot), and `clean_discovery` (fresh broad discovery). The SearchPlan is the reproducibility boundary; its hash, query statuses, source statuses, and coverage gaps are reported for every run.
 
 The open-source skill does **not** ship with a hidden fixed database or claim exhaustive Internet coverage. It builds a bounded plan for each requested region from the following source categories:
 

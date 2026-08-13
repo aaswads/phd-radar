@@ -5,7 +5,7 @@ description: Search, verify, score, rank, summarize, and display funded or salar
 
 # PhD Radar
 
-Turn the user's conversation into a bounded doctoral-opportunity search. Treat configured sources and open Web discovery as complementary discovery channels. Admit a Web lead to the ranked result set only after verifying it on an official project, university, department, institute, employer, or officially designated application page.
+Turn the user's conversation into a bounded, reproducible doctoral-opportunity search. Compile the effective profile into a versioned `SearchPlan`, execute fixed source/query quotas, reconcile discoveries with the persistent candidate ledger, verify official pages, then score and rank. Admit a Web lead to the ranked result set only after official verification.
 
 ## Choose the execution surface
 
@@ -14,6 +14,12 @@ Use available public Web search and browser tools directly for one-off discovery
 When no persistent state backend exists, complete one-off searches from the conversation. For a requested persistent profile or source change, show the exact proposed record and state clearly that it is not saved until a real writable state location is selected or available.
 
 Completion: every claimed search, saved setting, and registered source corresponds to an actual tool result or readable state artifact.
+
+## Reproducibility boundary
+
+Read [references/search-plan-contract.md](references/search-plan-contract.md) before searching. After resolving the profile, compile one SearchPlan with `scripts/compile_search_plan.py`. Save its JSON and report its `plan_hash`; use that plan's query IDs, family order, source order, budgets, and terminal statuses for the whole run. A SearchPlan is invalid if queries are invented during execution or if a required query/source is silently omitted.
+
+Use `stable_refresh` by default. Use `replay` only with a named saved search snapshot; it performs no new discovery. Use `clean_discovery` when the user explicitly asks for a fresh broad scan; it ignores historical candidates for discovery but may merge verified results into the ledger. When enabled, the SQLite candidate ledger is the continuity boundary: an absent search hit is not closure evidence. Carry candidates forward until an official page proves expiry/closure or the stale threshold requires manual review.
 
 ## Onboard and reuse the user profile
 
@@ -64,26 +70,26 @@ Read [references/institution-and-lab-screen.md](references/institution-and-lab-s
 
 Completion: intake is confirmed, every effective field traces to the user's words, a saved profile, or an explicitly disclosed default; ranking subjects use official labels; no one-off value is persisted.
 
-### 2. Build a two-channel plan for every region
+### 2. Compile the SearchPlan and source plan
 
 For each target region:
 
 1. Select enabled sources whose region and opportunity capabilities match.
-2. Generate bounded open Web queries using English and useful local-language role terms, topic synonyms, funding terms, and official-domain hints.
+2. Execute the fixed query families in the plan: exact topic, synonyms, method × domain, doctoral role terms, funding, project/funder, official pages, regional platforms, and source discovery.
 3. Record why each configured source is selected, skipped, or unavailable.
 4. State the query budget and coverage limits. Never claim exhaustive Internet coverage.
 
-Read [references/source-policy.md](references/source-policy.md) for source selection. Read [references/web-discovery-policy.md](references/web-discovery-policy.md) and [references/discovery-funnel.md](references/discovery-funnel.md) before generating Web queries or following discovery leads.
+Read [references/source-policy.md](references/source-policy.md) and [references/source-registry-contract.md](references/source-registry-contract.md) for source selection and registration. Read [references/web-discovery-policy.md](references/web-discovery-policy.md) and [references/discovery-funnel.md](references/discovery-funnel.md) before following discovery leads.
 
-Completion: every region has both a configured-source plan and an open-Web query set; every planned source and query has a bounded scope.
+Completion: the saved plan has a stable hash, every region has all required query families, every source has selected/skipped reasoning, and every query has a bounded budget.
 
 ### 3. Discover leads
 
-Run the breadth-first funnel: vacancy sources, institution/program pages, advisor/lab rosters, project/funder sources, then publication/directory expansion. For broad searches, target roughly four unique discovery candidates per requested formal result, capped at 80. Match through exact topics, adjacent topics, method + application-domain combinations, and advisor/lab continuity; do not require every profile keyword in one page. Record channel, source/query, URL, title, snippet, discovered time, and terminal status. Treat search snippets, aggregators, news, lab pages, social posts, scholarly directories, and funding pages as leads rather than vacancy proof.
+Run the fixed plan breadth-first: vacancy sources, institution/program pages, advisor/lab rosters, project/funder sources, then publication/directory expansion. Complete every required query family and every enabled core source before stopping. Record `query_id`, source ID, URL, title, snippet, discovered time, candidate ID, and terminal status. Treat snippets, aggregators, news, lab pages, social posts, scholarly directories, and funding pages as leads rather than vacancy proof.
 
 Deep-verify candidates in batches. When a candidate is excluded by QS, funding, deadline, eligibility, or official-return failure, continue from the discovery roster until the requested formal-result target or a documented saturation/budget stop condition is reached. Support both specific advertised positions and verified funded-program application routes when the profile permits them.
 
-Completion: every planned source and query ends as `success`, `zero_results`, `blocked`, `failed`, `skipped`, or `budget_limited`; leads remain separate from verified opportunities; a small final set has a reconciled discovery-to-exclusion funnel.
+Completion: every planned source and query ends as `success`, `zero_results`, `blocked`, `failed`, `skipped`, or `budget_limited`; every region meets its quota or names the gap; leads remain separate from verified opportunities; the funnel reconciles with ledger transitions.
 
 ### 3a. Research independent slices
 
@@ -117,9 +123,9 @@ Completion: each admitted opportunity has a verified gate outcome and a source-b
 
 ### 6. Normalize, deduplicate, and score
 
-Normalize verified opportunities to [references/contracts.md](references/contracts.md). Merge duplicates while retaining all discovery sources and field evidence. Keep objective facts separate from semantic judgments.
+Normalize verified opportunities to [references/contracts.md](references/contracts.md). Assign identity in this order: official vacancy/project ID, canonical official URL, institution + department + normalized title + application cycle, then a hash. Merge duplicates while retaining discovery sources, field evidence, and `merge_reason`; reuse the ledger's prior identity decision.
 
-Score `research_fit`, `eligibility_score`, `funding_confidence`, and `overall_match` from 0.0 to 10.0. Apply hard gates after scoring. Read [references/scoring-and-grades.md](references/scoring-and-grades.md) before scoring or explaining a grade.
+Score `research_fit`, `eligibility_score`, `funding_confidence`, and `overall_match` from 0.0 to 10.0 with fixed rubric sub-items and a rubric version. Reuse a prior score when evidence content hash, profile hash, and rubric version are unchanged; otherwise record `score_revision_reason`. Apply hard gates after scoring. Read [references/scoring-and-grades.md](references/scoring-and-grades.md) before scoring or explaining a grade.
 
 Completion: each result has four auditable scores, gate outcomes, a recommendation explanation, and a stable opportunity ID; duplicates appear once.
 
@@ -154,12 +160,14 @@ Completion: the checker passes, every candidate belongs to exactly one tier, and
 
 Report:
 
+- SearchPlan hash/version, run mode, snapshot ID, and query/source completion;
+
 - the effective request and coverage window;
 - configured-source selected/success/zero/failed/skipped counts;
 - Web query, lead, official-return, no-official-source, pending, and verified-contribution counts by region;
 - raw leads, parsed records, duplicates merged, verified formal opportunities, valid deadlines, and confirmed funding counts;
 - S/A/B/C and score-band counts;
-- new, updated, reopened, and expired counts when history exists;
+- new, updated, carried-forward, reopened, stale/manual-review, and expired counts; rediscovery rate, candidate-set Jaccard similarity, and Top-20 overlap when history exists;
 - failures, unknowns, and coverage gaps.
 - QS overall/subject pass, preferred, manual-review, and excluded counts; lab-audit strong/adequate/weak/incomplete counts.
 - formal, needs-confirmation, research-signal, and excluded counts, with the named critical gaps for provisional candidates.
@@ -168,7 +176,7 @@ Then show all worthwhile formal and needs-confirmation projects. Keep every item
 
 Distinguish `zero_results` from incomplete coverage. Do not make the user open an artifact to understand the main findings.
 
-Completion: statistics reconcile with the displayed verified result set and explicitly explain incomplete coverage.
+Explain each material change as `official_change`, `source_failure`, `budget_limited`, `new_discovery`, `carried_forward`, or `score_revision`. Completion: statistics reconcile with the displayed verified result set, ledger transitions are auditable, and incomplete coverage is explicit.
 
 ## Add a source
 
@@ -183,7 +191,7 @@ Accept a site name, home page, vacancy listing URL, or example vacancy URL.
 7. Persist only after confirmation. Enter as `testing`; enable only after its fixture and contract test pass.
 8. If the user asked to continue searching, rebuild the search plan only after enablement succeeds.
 
-Read [references/source-policy.md](references/source-policy.md) before probing or registering a source.
+Read [references/source-policy.md](references/source-policy.md) and [references/source-registry-contract.md](references/source-registry-contract.md) before probing or registering a source. A source registration must include its stable-ID and pagination rules, health status, fixture, and contract test; preview it before persistence.
 
 Completion: the source has a unique ID, canonical entry URL, capability labels, access policy, test evidence, and explicit status; a rejected source is not represented as searched.
 
