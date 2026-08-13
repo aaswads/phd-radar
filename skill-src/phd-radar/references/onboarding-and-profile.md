@@ -34,7 +34,7 @@ Read the executable defaults with `python scripts/profile_store.py defaults`, th
 - lab review window: five years;
 - lab signals: recent research, ERC/MSCA, doctoral outputs/destinations, external collaboration;
 - output language: Chinese;
-- dashboard: one overall 10-point score only.
+- dashboard: generate and open automatically after the first and later searches; show one overall 10-point score only.
 - formal result target: 20; broad discovery roster target: about 60 candidates;
 - application routes: specific advertised positions plus verified funded-program routes.
 

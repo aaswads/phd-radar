@@ -310,7 +310,7 @@
       const qsScreen = document.getElementById('qs-screen').value;
       const labScreen = document.getElementById('lab-screen').value;
       const visible = results.filter(item => (!q || [item.title,item.institution,item.department,item.pi_or_contact,item.country,item.city].join(' ').toLowerCase().includes(q)) && (!country || item.country === country) && Number(item.overall_match_raw ?? item.overall_match ?? 0) >= min && (!qsScreen || item.institution_screen?.outcome === qsScreen) && (!labScreen || item.lab_screen?.status === labScreen));
-      cards.innerHTML = visible.length ? visible.map(card).join('') : '<div class="empty"><h3>没有符合当前筛选的项目</h3><p>调整地区、等级或最低分后再查看。</p></div>';
+      cards.innerHTML = visible.length ? visible.map(card).join('') : '<div class="empty"><h3>没有符合当前筛选的项目</h3><p>调整地区、最低分、QS 或课题组筛选后再查看。</p></div>';
       document.getElementById('results-count').textContent = `显示 ${visible.length} / ${results.length}`;
       cards.querySelectorAll('.evidence-toggle').forEach(btn => btn.addEventListener('click', () => {
         const panel = document.getElementById(btn.getAttribute('aria-controls'));

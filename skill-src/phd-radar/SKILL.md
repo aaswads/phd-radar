@@ -21,16 +21,32 @@ Before resolving a search, check for an existing profile with `python scripts/pr
 
 For later searches, start from that profile and apply current-turn overrides. Preview and confirm persistent patches; apply explicit temporary overrides without changing saved state. Read the saved profile back after every write. Never repeat the full onboarding form when a usable profile already exists.
 
+Treat a legacy profile with no `dashboard` object as `dashboard.generate: true` and `dashboard.auto_open: true`. This backward-compatible default does not require a profile rewrite before the next search.
+
 Completion: every search uses a readable saved default or an explicitly disclosed temporary configuration, and the user can change it conversationally.
+
+### FIRST_RUN_AUTO_DASHBOARD
+
+Treat the user's completed first-use form as authorization for the full local read-only workflow. Continue in the same task without waiting for another “开始搜索” or “打开 Dashboard” message. The mandatory first-run sequence is **save → search → render → serve → open**:
+
+1. save and read back the `default` profile;
+2. run the search and produce a valid `DashboardPacket`;
+3. render the self-contained Dashboard;
+4. start or reuse a local static server;
+5. call `codex_app__open_in_codex` with the mounted browser URL when that tool is available.
+
+Build and open the Dashboard including zero verified results; in that case show the empty result state plus coverage, source failures, pending leads, and exclusion statistics. If the user explicitly disables `dashboard.auto_open`, still generate the page and return its path without opening it. Do not claim that the Dashboard loaded unless the mounted URL responded successfully and the open action succeeded or was queued.
+
+Completion: the first configuration reply ends with a mounted Dashboard opened in Codex, or with a precise tool/server failure and a usable generated-file path.
 
 ## Route the request
 
-- For a first use without a profile, run **Onboard**, then **Search** after the user confirms the saved profile.
+- For a first use without a profile, run **Onboard**, then automatically run **Search** and **Build the dashboard** in the same task.
 - For a new or one-off search with a profile, run **Search**.
 - For “refresh”, reuse the saved profile and apply only explicit current-turn overrides.
 - For “以后/默认/保存”, preview the persistent profile delta and apply it only after confirmation.
 - For a request to add a site, run **Add a source**.
-- For “dashboard/网页/卡片展示/打开结果”, run **Build the dashboard** after ensuring a ranked result packet exists.
+- After every completed search, run **Build the dashboard** by default. Also run it for explicit “dashboard/网页/卡片展示/打开结果” requests using the latest packet.
 - For explanation or comparison, use the existing verified result evidence; search again only when freshness or missing evidence requires it.
 - Use another skill for advisor-only discovery, deep advisor background research, application documents, outreach, interviews, or submitting an application.
 
@@ -162,9 +178,11 @@ python scripts/render_dashboard.py <results.json> --output <output/phd-radar-das
 
 The renderer reapplies deterministic ranking and embeds all data locally. Mount the output directory with an available local static server, reuse an existing server when possible, and return the local URL. Keep the server and page read-only.
 
+Probe the mounted URL for a successful response, then use `codex_app__open_in_codex` with `{target: {type: "browser", url: mounted_url}}` when available. Opening is part of the default search delivery, not an optional follow-up. If the app-opening tool is unavailable, open the mounted URL with the available browser surface and return a clickable URL.
+
 Inspect the rendered page at desktop and narrow-mobile widths before handoff. Verify card order, filters, empty state, Apply/project/PI links, disabled missing links, evidence expansion, long titles, and partial-coverage warnings. Preserve the main findings in the conversation even when a dashboard is provided.
 
-Completion: the mounted page loads without external dependencies, cards match the ranked opportunity-ID order, every external action is valid or explicitly unavailable, and the user receives the local URL.
+Completion: the mounted page loads without external dependencies, cards match the ranked opportunity-ID order, every external action is valid or explicitly unavailable, and the user receives the local URL with the page opened automatically unless disabled.
 
 ## Authorization
 

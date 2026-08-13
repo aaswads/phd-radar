@@ -46,6 +46,7 @@ DEFAULT_PROFILE = {
         "external_partner_keywords": [],
     },
     "output_language": "zh-CN",
+    "dashboard": {"generate": True, "auto_open": True},
 }
 
 

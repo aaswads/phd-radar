@@ -1,4 +1,4 @@
 interface:
   display_name: "PhD Radar"
   short_description: "Search, QS-screen, audit labs, and rank funded PhD opportunities"
-  default_prompt: "Use $phd-radar. If I have no saved profile, guide me through first-time setup and save it; otherwise reuse my profile to find, verify, QS-screen, audit, rank, and display funded PhD opportunities."
+  default_prompt: "Use $phd-radar. On first use, save my setup, search immediately, then generate, mount, and open the results dashboard automatically; otherwise reuse my profile and open the refreshed dashboard."

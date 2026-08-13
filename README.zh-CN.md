@@ -12,7 +12,7 @@ PhD Radar 是一个面向 Codex 的博士机会搜索技能，用于发现、核
 - 返回大学、研究机构、雇主、项目或官方申请页面核验信息。
 - 可按配置执行 QS 学校/学科门槛和研究团队证据检查。
 - 对已核验结果按 0.0-10.0 分评分，并使用确定性规则排序。
-- 汇报搜索覆盖与排除原因，并可生成独立的 HTML 卡片仪表盘。
+- 汇报搜索覆盖与排除原因，并自动生成、挂载和打开独立的 HTML 卡片仪表盘。
 
 ## 安装
 
@@ -149,9 +149,9 @@ QS 目标学科：Materials Sciences、Engineering - Chemical
 
 ## 结果与仪表盘
 
-PhD Radar 会先汇报实际搜索条件和覆盖情况，包括选中及失败的来源、Web 查询、原始线索、官方页面回查、重复项、排除项、已核验结果、资助确认、截止日期、QS 结果和未完成检查。随后展示带官方链接与申请链接的排序候选清单。主要结论会保留在对话中，因此仪表盘不是理解结果的必要条件。
+PhD Radar 会先汇报实际搜索条件和覆盖情况，包括选中及失败的来源、Web 查询、原始线索、官方页面回查、重复项、排除项、已核验结果、资助确认、截止日期、QS 结果和未完成检查。随后展示带官方链接与申请链接的排序候选清单。首次配置及以后每次搜索完成后，技能都会在当前 Codex 任务中自动生成、挂载并打开仪表盘；即使正式结果为 0，也会打开空状态页展示排除原因和覆盖缺口。用户可以通过对话将 `dashboard.auto_open` 改为 `false`，保留生成但关闭自动打开。
 
-用户要求后，技能可以生成独立、只读的 HTML 仪表盘：
+技能会生成独立、只读的 HTML 仪表盘：
 
 ```powershell
 python .\skill-src\phd-radar\scripts\render_dashboard.py results.json `
@@ -190,6 +190,7 @@ skill-src/phd-radar/
 运行项目自带的确定性排序自测：
 
 ```powershell
+python .\skill-src\phd-radar\scripts\check_first_run_workflow.py
 python .\skill-src\phd-radar\scripts\rank_results.py --self-test
 ```
 

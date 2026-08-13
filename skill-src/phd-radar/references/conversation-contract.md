@@ -44,6 +44,9 @@ lab_screen:
   inspect_alumni_destinations: true
   external_partner_keywords: []
 output_language: zh-CN
+dashboard:
+  generate: true
+  auto_open: true
 persistence: saved_default
 ```
 

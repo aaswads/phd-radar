@@ -1,6 +1,6 @@
 # Dashboard contract
 
-Use this reference when the user asks to generate, mount, open, or change the results dashboard.
+Use this reference after every completed search and when the user asks to generate, mount, open, or change the results dashboard.
 
 ## Purpose
 
@@ -61,4 +61,6 @@ python -m http.server 8765 --directory output
 
 Reuse an already-running server when possible. The server is read-only by convention: the generated page contains no write API.
 
-Completion: the page loads without external dependencies, every card has valid or explicitly unavailable actions, filters work, and the visible order matches the ranked input packet.
+Probe the mounted URL, then open it in the current Codex task with `codex_app__open_in_codex` when available. Generate and open an empty-state Dashboard when there are no verified formal results so coverage and exclusion outcomes remain visible. Respect an explicit saved `dashboard.auto_open: false` by generating without opening.
+
+Completion: the page loads without external dependencies, every card has valid or explicitly unavailable actions, filters work, the visible order matches the ranked input packet, and the mounted page opens automatically unless disabled.

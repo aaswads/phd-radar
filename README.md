@@ -12,7 +12,7 @@ PhD Radar is a Codex skill for discovering, verifying, screening, scoring, ranki
 - Returns to official university, institute, employer, project, or application pages for verification.
 - Applies optional QS institution/subject gates and research-group evidence checks.
 - Scores verified results on a 0.0-10.0 scale and ranks them deterministically.
-- Reports search coverage and exclusions, then optionally creates a self-contained HTML dashboard.
+- Reports search coverage and exclusions, then automatically generates, mounts, and opens a self-contained HTML dashboard.
 
 ## Install
 
@@ -149,9 +149,9 @@ This order is reproducible with `scripts/rank_results.py` and remains consistent
 
 ## Results and dashboard
 
-PhD Radar first reports the effective request and coverage: selected and failed sources, Web queries, raw leads, official returns, duplicates, exclusions, verified results, funding confirmations, deadlines, QS outcomes, and incomplete checks. It then presents the ranked shortlist with official and application links. The main findings remain in the conversation, so the dashboard is optional.
+PhD Radar first reports the effective request and coverage: selected and failed sources, Web queries, raw leads, official returns, duplicates, exclusions, verified results, funding confirmations, deadlines, QS outcomes, and incomplete checks. It then presents the ranked shortlist with official and application links. After the first setup and every later search, it automatically generates, mounts, and opens the dashboard in the current Codex task. This also happens for zero-result searches so the empty state, exclusions, and coverage gaps remain inspectable. Set `dashboard.auto_open` to `false` through conversation to generate without opening.
 
-When requested, the skill generates a self-contained, read-only HTML dashboard:
+The skill generates a self-contained, read-only HTML dashboard:
 
 ```powershell
 python .\skill-src\phd-radar\scripts\render_dashboard.py results.json `
@@ -190,6 +190,7 @@ skill-src/phd-radar/
 Run the bundled deterministic ranking self-test:
 
 ```powershell
+python .\skill-src\phd-radar\scripts\check_first_run_workflow.py
 python .\skill-src\phd-radar\scripts\rank_results.py --self-test
 ```
 
